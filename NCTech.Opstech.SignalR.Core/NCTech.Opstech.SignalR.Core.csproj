@@ -8,6 +8,8 @@
 	<PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
 	<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.3" />
 	<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.3" />
+	<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
 	<PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.3" />
 	<PackageReference Include="NCTech.Opstech.Core.Api" Version="22.1.22" />
 	<PackageReference Include="NCTech.Opstech.Util" Version="22.1.21" />
