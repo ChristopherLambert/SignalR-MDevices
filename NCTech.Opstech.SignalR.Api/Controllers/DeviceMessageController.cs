@@ -10,13 +10,13 @@ namespace NCTech.Opstech.Oee.Api.Controllers.Equipments.v1;
 [ApiVersion(1)]
 [ApiController]
 [Route("api/v{v:apiVersion}/[controller]")]
-public class EquipmentController : NCApiController
+public class DeviceMessageController : NCApiController
 {
     private readonly IQueryDispatcher _queryDispatcher;
     private readonly ICommandDispatcher _commandDispatcher;
     // private readonly IEquipmentEntityService _equipmentEntityService;
 
-    public EquipmentController(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher
+    public DeviceMessageController(IQueryDispatcher queryDispatcher, ICommandDispatcher commandDispatcher
         /* ,IEquipmentEntityService equipmentEntityService*/)
     {
         _queryDispatcher = queryDispatcher;
