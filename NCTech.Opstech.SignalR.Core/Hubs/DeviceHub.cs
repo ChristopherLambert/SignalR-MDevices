@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NCTech.Opstech.Oee.Core.Services.EntityServices.Departments;
 using NCTech.Opstech.Oee.Core.Services.EntityServices.Departments.Interface;
 using NCTech.Opstech.Oee.SignalR.Domains.Models;
 
@@ -9,11 +10,14 @@ namespace NCTech.Opstech.SignalR.Core.Hub
     public class DeviceHub : Microsoft.AspNetCore.SignalR.Hub
     {
         private readonly IDeviceEntityService _deviceEntityService;
+        private readonly IDeviceMessageEntityService _deviceMessageEntityService;
         private readonly ILogger<DeviceHub> _logger;
 
-        public DeviceHub(IDeviceEntityService deviceEntityService, ILogger<DeviceHub> logger)
+        public DeviceHub(IDeviceEntityService deviceEntityService,
+            IDeviceMessageEntityService deviceMessageEntityService, ILogger<DeviceHub> logger)
         {
             _deviceEntityService = deviceEntityService;
+            _deviceMessageEntityService = deviceMessageEntityService;
             _logger = logger;
         }
 
@@ -89,22 +93,23 @@ namespace NCTech.Opstech.SignalR.Core.Hub
                 var device = await _deviceEntityService.GetByIdConnection(Context.ConnectionId);
                 if (device != null)
                 {
-                    var messageEntity = new Message
+                    var messageEntity = new DeviceMessage
                     {
-                        TagId = device.Tag,
-                        Content = message,
+                        // TagId = device.Tag,
+                        PayloadJson = message,
                         // Type = MessageType.FromEquipment,
-                        Timestamp = DateTime.UtcNow
+                        // Timestamp = DateTime.UtcNow
                     };
 
-                    _context.Messages.Add(messageEntity);
-                    equipment.LastActivity = DateTime.UtcNow;
-                    await _context.SaveChangesAsync();
+                    _deviceMessageEntityService.Insert(messageEntity);
+                    // device.LastActivity = DateTime.UtcNow;
+                    await _deviceMessageEntityService.SaveChangesAsync();
 
-                    _logger.LogInformation($"Message received from equipment {equipment.TagId}: {message}");
+                    _logger.LogInformation($"Message received from " +
+                        $"device to equipment {device.Tag}: {message}");
 
-                    // Envia mensagem apenas para servidores/monitores, não para outros equipamentos
-                    await Clients.Group("Servers").SendAsync("MessageFromEquipment", equipment.TagId, message, DateTime.UtcNow);
+                    // Envia mensagem apenas para servidores/monitores, não para outros devices
+                    await Clients.Group("Servers").SendAsync("MessageFromDevice", device.Tag, message, DateTime.UtcNow);
                 }
             }
             catch (Exception ex)
