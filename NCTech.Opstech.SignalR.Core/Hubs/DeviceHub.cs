@@ -119,31 +119,30 @@ namespace NCTech.Opstech.SignalR.Core.Hub
             }
         }
 
-        //public override async Task OnDisconnectedAsync(Exception? exception)
-        //{
-        //    try
-        //    {
-        //        var equipment = await _context.Equipments
-        //            .FirstOrDefaultAsync(e => e.ConnectionId == Context.ConnectionId);
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            try
+            {
+                var device = await _deviceEntityService.GetByIdConnection(Context.ConnectionId);
 
-        //        if (equipment != null)
-        //        {
-        //            equipment.IsConnected = false;
-        //            equipment.LastActivity = DateTime.UtcNow;
-        //            await _context.SaveChangesAsync();
+                if (device != null)
+                {
+                    device.IsConnected = false;
+                    // equipment.LastActivity = DateTime.UtcNow;
+                    await _deviceEntityService.SaveChangesAsync();
 
-        //            _logger.LogInformation($"Equipment {equipment.TagId} disconnected");
+                    _logger.LogInformation($"Device by Equipment {device.Tag} disconnected");
 
-        //            // Notifica apenas os servidores/monitores sobre a desconexão
-        //            await Clients.Group("Servers").SendAsync("EquipmentDisconnected", equipment.TagId);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error handling disconnection");
-        //    }
+                    // Notifica apenas os servidores/monitores sobre a desconexão
+                    await Clients.Group("Servers").SendAsync("EquipmentDisconnected", device.Tag);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling disconnection");
+            }
 
-        //    await base.OnDisconnectedAsync(exception);
-        //}
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }
